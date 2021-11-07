@@ -1,0 +1,33 @@
+version: '3.7'
+
+volumes:
+  postgres_data:
+      driver: local
+
+services:
+  postgres:
+      image: postgres
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      environment:
+        POSTGRES_DB: aam
+        POSTGRES_USER: aam
+        POSTGRES_PASSWORD: aam
+  keycloak:
+      image: jboss/keycloak:latest
+      volumes:
+        - ../realm:/opt/jboss/keycloak/imports
+      environment:
+        DB_VENDOR: POSTGRES
+        DB_ADDR: postgres
+        DB_DATABASE: aam
+        DB_USER: aam
+        DB_SCHEMA: public
+        DB_PASSWORD: aam
+        KEYCLOAK_USER: admin
+        KEYCLOAK_PASSWORD: admin
+        KEYCLOAK_IMPORT: /opt/jboss/keycloak/imports/realm-export.json -Dkeycloak.profile.feature.upload_scripts=enabled
+      ports:
+        - 8080:8080
+      depends_on:
+        - postgres
